@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food AI Interface - Enhanced</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .form-section h3 {
+            margin-top: 0;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .checkbox-item:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        .checkbox-item.selected {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1976d2;
+        }
+        .slider-container {
+            margin: 15px 0;
+        }
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+        }
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: none;
+        }
+        .slider-value {
+            text-align: center;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 5px;
+        }
+        .range-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .range-inputs input {
+            width: 80px;
+        }
+        button {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        #results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        .bundle {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .bundle h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .bundle-score {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+        }
+        .bundle ul {
+            padding-left: 20px;
+        }
+        .bundle code {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        /* Feedback Styles */
+        .feedback-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .feedback-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            background-color: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            flex: 1;
+            min-width: 100px;
+            max-width: 150px;
+        }
+        
+        .feedback-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        
+        .feedback-up:hover {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .feedback-down:hover {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .feedback-detail:hover {
+            background-color: #e2e3e5;
+            border-color: #6c757d;
+            color: #383d41;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+        
+        .close-modal:hover {
+            color: #333;
+        }
+        
+        .rating-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .rating-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .star {
+            font-size: 24px;
+            cursor: pointer;
+            color: #ddd;
+        }
+        
+        .star.active {
+            color: #ffc107;
+        }
+        
+        .feedback-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .feedback-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍽️ Food AI Bundle Generator</h1>
+        
+        <form id="foodForm">
+            <!-- Taste Profile Section -->
+            <div class="form-section">
+                <h3>🍎 Taste Profile</h3>
+                <label>Select desired tastes:</label>
+                <div class="checkbox-group" id="tasteProfile">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="taste-umami" value="Umami">
+                        <label for="taste-umami">Umami</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="taste-sweet" value="Sweet">
+                        <label for="taste-sweet">Sweet</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="taste-salty" value="Salty">
+                        <label for="taste-salty">Salty</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="taste-sour" value="Sour">
+                        <label for="taste-sour">Sour</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="taste-bitter" value="Bitter">
+                        <label for="taste-bitter">Bitter</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="taste-spicy" value="Spicy">
+                        <label for="taste-spicy">Spicy</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="taste-savory" value="Savory">
+                        <label for="taste-savory">Savory</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="taste-fruity" value="Fruity">
+                        <label for="taste-fruity">Fruity</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Texture Section -->
+            <div class="form-section">
+                <h3>🥄 Texture Preference</h3>
+                <div class="slider-container">
+                    <label>Texture (Soft ← → Crunchy):</label>
+                    <input type="range" id="texture" class="slider" min="0" max="100" value="50">
+                    <div class="slider-value" id="textureValue">50</div>
+                </div>
+            </div>
+
+            <!-- Nutritional Constraints -->
+            <div class="form-section">
+                <h3>🥗 Nutritional Constraints</h3>
+                <div class="form-row">
+                    <div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="vegan">
+                            <label for="vegan">Vegan</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="glutenFree">
+                            <label for="glutenFree">Gluten Free</label>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label>Calorie Range:</label>
+                            <div class="range-inputs">
+                                <input type="number" id="calorieMin" value="200" min="50" max="2000"> - 
+                                <input type="number" id="calorieMax" value="600" min="50" max="2000"> kcal
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Protein Range:</label>
+                            <div class="range-inputs">
+                                <input type="number" id="proteinMin" value="10" min="0" max="100"> - 
+                                <input type="number" id="proteinMax" value="30" min="0" max="100"> g
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Functional Constraints -->
+            <div class="form-section">
+                <h3>⚙️ Functional Constraints</h3>
+                <div class="form-row">
+                    <div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="heatStable">
+                            <label for="heatStable">Heat Stable</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="snackForm">
+                            <label for="snackForm">Snack Form</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="baseIngredient">
+                            <label for="baseIngredient">Base Ingredient</label>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label for="costPreference">Cost Preference:</label>
+                            <select id="costPreference">
+                                <option value="Low">Low</option>
+                                <option value="Moderate" selected>Moderate</option>
+                                <option value="Premium">Premium</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Priorities -->
+            <div class="form-section">
+                <h3>📊 Priorities</h3>
+                <div class="form-row">
+                    <div class="slider-container">
+                        <label>Taste Priority:</label>
+                        <input type="range" id="tastePriority" class="slider" min="0" max="100" value="33">
+                        <div class="slider-value" id="tastePriorityValue">33</div>
+                    </div>
+                    <div class="slider-container">
+                        <label>Texture Priority:</label>
+                        <input type="range" id="texturePriority" class="slider" min="0" max="100" value="33">
+                        <div class="slider-value" id="texturePriorityValue">33</div>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label>Nutrition Priority:</label>
+                    <input type="range" id="nutritionPriority" class="slider" min="0" max="100" value="34">
+                    <div class="slider-value" id="nutritionPriorityValue">34</div>
+                </div>
+            </div>
+
+            <!-- User Notes -->
+            <div class="form-section">
+                <h3>📝 Additional Notes</h3>
+                <div class="form-group">
+                    <label for="userNotes">Describe what you're looking for:</label>
+                    <textarea id="userNotes" placeholder="e.g., I want something spicy for dinner, vegetarian preferred, with Mediterranean flavors..."></textarea>
+                </div>
+            </div>
+
+            <!-- Generation Parameters -->
+            <div class="form-section">
+                <h3>⚡ Generation Parameters</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bundleCount">Number of bundles:</label>
+                        <select id="bundleCount">
+                            <option value="3">3</option>
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bundleSize">Ingredients per bundle:</label>
+                        <select id="bundleSize">
+                            <option value="2">2</option>
+                            <option value="3" selected>3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">🚀 Generate Food Bundles</button>
+        </form>
+
+        <div id="results">
+            <h2>🎯 Results</h2>
+            <div id="bundleResults"></div>
+        </div>
+    </div>
+    
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeFeedbackModal()">&times;</span>
+            <h2>Detailed Feedback</h2>
+            <p id="modalBundleInfo">Bundle ingredients: <span id="modalIngredients"></span></p>
+            
+            <div class="rating-container">
+                <div class="rating-group">
+                    <label><strong>Flavor Rating:</strong></label>
+                    <div class="rating-stars" id="flavorRating">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                </div>
+                
+                <div class="rating-group">
+                    <label><strong>Texture Rating:</strong></label>
+                    <div class="rating-stars" id="textureRating">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="feedbackComments"><strong>Additional Comments:</strong></label>
+                    <textarea id="feedbackComments" placeholder="Please share any additional thoughts about this ingredient combination..."></textarea>
+                </div>
+            </div>
+            
+            <button id="submitDetailedFeedback" onclick="submitDetailedFeedback()">Submit Feedback</button>
+            <div id="feedbackResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'http://localhost:5000';
+        
+        // Update slider values dynamically
+        function updateSliderValue(sliderId, valueId) {
+            const slider = document.getElementById(sliderId);
+            const valueDisplay = document.getElementById(valueId);
+            valueDisplay.textContent = slider.value;
+            slider.addEventListener('input', () => {
+                valueDisplay.textContent = slider.value;
+            });
+        }
+
+        // Initialize sliders
+        updateSliderValue('texture', 'textureValue');
+        updateSliderValue('tastePriority', 'tastePriorityValue');
+        updateSliderValue('texturePriority', 'texturePriorityValue');
+        updateSliderValue('nutritionPriority', 'nutritionPriorityValue');
+
+        // Handle checkbox styling
+        document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const item = this.closest('.checkbox-item');
+                if (this.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        });
+
+        // Form submission
+        document.getElementById('foodForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const resultsDiv = document.getElementById('results');
+            const bundleResults = document.getElementById('bundleResults');
+            
+            // Collect all form data
+            const tasteProfile = Array.from(document.querySelectorAll('#tasteProfile input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+            
+            const formData = {
+                tasteProfile: tasteProfile,
+                texture: parseInt(document.getElementById('texture').value),
+                nutritionalConstraints: {
+                    vegan: document.getElementById('vegan').checked,
+                    glutenFree: document.getElementById('glutenFree').checked,
+                    calorieRange: [
+                        parseInt(document.getElementById('calorieMin').value),
+                        parseInt(document.getElementById('calorieMax').value)
+                    ],
+                    proteinRange: [
+                        parseInt(document.getElementById('proteinMin').value),
+                        parseInt(document.getElementById('proteinMax').value)
+                    ]
+                },
+                functionalConstraints: {
+                    heatStable: document.getElementById('heatStable').checked,
+                    snackForm: document.getElementById('snackForm').checked,
+                    baseIngredient: document.getElementById('baseIngredient').checked,
+                    costPreference: document.getElementById('costPreference').value
+                },
+                priorities: {
+                    taste: parseInt(document.getElementById('tastePriority').value),
+                    texture: parseInt(document.getElementById('texturePriority').value),
+                    nutrition: parseInt(document.getElementById('nutritionPriority').value)
+                },
+                userNotes: document.getElementById('userNotes').value.trim(),
+                top_k: parseInt(document.getElementById('bundleCount').value),
+                bundle_size: parseInt(document.getElementById('bundleSize').value)
+            };
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = '🔄 Generating...';
+            resultsDiv.style.display = 'block';
+            bundleResults.innerHTML = '<div class="loading">🔄 Generating food bundles with your preferences...</div>';
+            
+            try {
+                // Make API request
+                const response = await fetch(`${API_BASE}/formulate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Display results
+                let html = "";
+
+                if (data.bundles && data.bundles.length > 0) {
+                    html += `<p><strong>✅ Generated ${data.bundles.length} bundles based on your preferences:</strong></p>`;
+
+                    data.bundles.forEach((bundle, index) => {
+                        let ingredientsList = (bundle.ingredients || []).map(ing => {
+                            if (typeof ing === 'string') return ing;
+                            if (typeof ing === 'object') return ing.name || ing.ingredient_name || ing.title || JSON.stringify(ing);
+                            return String(ing);
+                        }).join(', ');
+
+                        html += `
+                            <div class="bundle">
+                                <h4>Bundle ${index + 1} ${bundle.name ? `- ${bundle.name}` : ''} 
+                                    <span class="bundle-score">${(bundle.score || 0).toFixed(3)}</span>
+                                </h4>
+                                <p><strong>🥘 Ingredients:</strong> ${ingredientsList}</p>
+                                ${bundle.description ? `<p><strong>📝 Description:</strong> ${bundle.description}</p>` : ''}
+                                ${bundle.reasoning ? `<p><strong>🤔 Reasoning:</strong> ${bundle.reasoning}</p>` : ''}
+                                ${bundle.nutritionalInfo ? `<p><strong>🥗 Nutrition:</strong> ${JSON.stringify(bundle.nutritionalInfo)}</p>` : ''}
+                                <div class="feedback-controls">
+                                    <button class="feedback-btn feedback-up" onclick="submitFeedback(${index}, 'up', ${JSON.stringify(bundle.ingredients.map(ing => typeof ing === 'string' ? ing : (ing.name || ing.ingredient_name || ing.title || JSON.stringify(ing))))})">
+                                        <span class="feedback-icon">👍</span> Like
+                                    </button>
+                                    <button class="feedback-btn feedback-down" onclick="submitFeedback(${index}, 'down', ${JSON.stringify(bundle.ingredients.map(ing => typeof ing === 'string' ? ing : (ing.name || ing.ingredient_name || ing.title || JSON.stringify(ing))))})">
+                                        <span class="feedback-icon">👎</span> Dislike
+                                    </button>
+                                    <button class="feedback-btn feedback-detail" onclick="showDetailedFeedback(${index}, ${JSON.stringify(bundle.ingredients.map(ing => typeof ing === 'string' ? ing : (ing.name || ing.ingredient_name || ing.title || JSON.stringify(ing))))})">
+                                        <span class="feedback-icon">✏️</span> Detailed Feedback
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<div class="error">❌ No bundles were generated. Try adjusting your preferences or description.</div>`;
+                }
+
+                // Append server-side logs if available
+                if (data.debug_info?.logs?.length > 0) {
+                    html += `<div class="bundle"><h4>🪵 Backend Logs:</h4><ul>`;
+                    data.debug_info.logs.forEach(log => {
+                        html += `<li><code>${log}</code></li>`;
+                    });
+                    html += `</ul></div>`;
+                }
+
+                // Add thought process if available
+                if (data.thought_process && data.thought_process.length > 0) {
+                    html += `<div class="bundle"><h4>💭 AI Thought Process:</h4><ul>`;
+                    data.thought_process.forEach(thought => {
+                        html += `<li>${thought}</li>`;
+                    });
+                    html += `</ul></div>`;
+                }
+
+                bundleResults.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                bundleResults.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error:</strong> ${error.message}<br>
+                        <small>Make sure the Flask server is running on port 5000</small>
+                    </div>
+                `;
+            } finally {
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Generate Food Bundles';
+            }
+        });
+        
+        // Test API connection on page load
+        window.addEventListener('load', async function() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    console.log('✅ API connection successful');
+                } else {
+                    console.warn('⚠️ API responded but with non-200 status');
+                }
+            } catch (error) {
+                console.error('❌ API connection failed:', error);
+            }
+        });
+        
+        // Feedback functionality
+        let currentBundleIndex = null;
+        let currentBundleIngredients = null;
+        let flavorRating = 0;
+        let textureRating = 0;
+        
+        // Quick feedback submission (thumbs up/down)
+        async function submitFeedback(bundleIndex, feedbackType, ingredients) {
+            try {
+                const bundle = document.querySelectorAll('.bundle')[bundleIndex];
+                
+                // Ensure ingredients is properly formatted
+                let processedIngredients = ingredients;
+                if (typeof ingredients === 'string') {
+                    try {
+                        processedIngredients = JSON.parse(ingredients);
+                    } catch (e) {
+                        console.warn('Could not parse ingredients string:', e);
+                        processedIngredients = [ingredients];
+                    }
+                }
+                
+                const feedbackData = {
+                    bundle_id: `bundle-${bundleIndex}`,
+                    ingredients: processedIngredients,
+                    feedback: feedbackType,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Get the score if available
+                const scoreElement = bundle.querySelector('.bundle-score');
+                if (scoreElement) {
+                    feedbackData.total_score = parseFloat(scoreElement.textContent);
+                }
+                
+                if (USE_LOCAL_STORAGE) {
+                    // Save to local storage
+                    saveFeedbackToLocalStorage(feedbackData);
+                    
+                    // Show success message
+                    const feedbackControls = bundle.querySelector('.feedback-controls');
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'feedback-success';
+                    successMessage.textContent = feedbackType === 'up' ? '👍 Thank you for your positive feedback!' : '👎 Thank you for your feedback!';
+                    feedbackControls.appendChild(successMessage);
+                    
+                    // Remove success message after 3 seconds
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 3000);
+                    
+                    console.log('Feedback saved to local storage:', feedbackData);
+                } else {
+                    // Use server API
+                    const response = await fetch(`${API_BASE}/feedback`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(feedbackData)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    // Show success message
+                    const feedbackControls = bundle.querySelector('.feedback-controls');
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'feedback-success';
+                    successMessage.textContent = feedbackType === 'up' ? '👍 Thank you for your positive feedback!' : '👎 Thank you for your feedback!';
+                    feedbackControls.appendChild(successMessage);
+                    
+                    // Remove success message after 3 seconds
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 3000);
+                    
+                    console.log('Feedback submitted successfully:', result);
+                }
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                alert(`Error submitting feedback: ${error.message}`);
+            }
+        }
+        
+        // Show detailed feedback modal
+        function showDetailedFeedback(bundleIndex, ingredients) {
+            currentBundleIndex = bundleIndex;
+            
+            // Ensure ingredients is properly formatted
+            let processedIngredients = ingredients;
+            if (typeof ingredients === 'string') {
+                try {
+                    processedIngredients = JSON.parse(ingredients);
+                } catch (e) {
+                    console.warn('Could not parse ingredients string:', e);
+                    processedIngredients = [ingredients];
+                }
+            }
+            currentBundleIngredients = processedIngredients;
+            
+            // Reset ratings
+            flavorRating = 0;
+            textureRating = 0;
+            document.querySelectorAll('#flavorRating .star').forEach(star => star.classList.remove('active'));
+            document.querySelectorAll('#textureRating .star').forEach(star => star.classList.remove('active'));
+            document.getElementById('feedbackComments').value = '';
+            document.getElementById('feedbackResult').innerHTML = '';
+            
+            // Set bundle info
+            document.getElementById('modalIngredients').textContent = Array.isArray(processedIngredients) ? processedIngredients.join(', ') : processedIngredients;
+            
+            // Show modal
+            document.getElementById('feedbackModal').style.display = 'block';
+        }
+        
+        // Close feedback modal
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').style.display = 'none';
+        }
+        
+        // Initialize star ratings
+        document.querySelectorAll('.rating-stars').forEach(container => {
+            const stars = container.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.getAttribute('data-value'));
+                    const ratingId = this.closest('.rating-stars').id;
+                    
+                    // Update visual state
+                    stars.forEach(s => {
+                        if (parseInt(s.getAttribute('data-value')) <= value) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                    
+                    // Store rating value
+                    if (ratingId === 'flavorRating') {
+                        flavorRating = value;
+                    } else if (ratingId === 'textureRating') {
+                        textureRating = value;
+                    }
+                });
+                
+                // Hover effects
+                star.addEventListener('mouseenter', function() {
+                    const value = parseInt(this.getAttribute('data-value'));
+                    stars.forEach(s => {
+                        if (parseInt(s.getAttribute('data-value')) <= value) {
+                            s.style.color = '#ffc107';
+                        }
+                    });
+                });
+                
+                star.addEventListener('mouseleave', function() {
+                    stars.forEach(s => {
+                        if (!s.classList.contains('active')) {
+                            s.style.color = '#ddd';
+                        }
+                    });
+                });
+            });
+        });
+        
+        // Local storage functions for feedback
+        function saveFeedbackToLocalStorage(feedbackData) {
+            // Get existing feedback
+            let allFeedback = JSON.parse(localStorage.getItem('foodAiFeedback') || '[]');
+            
+            // Add new feedback
+            allFeedback.push(feedbackData);
+            
+            // Save back to local storage
+            localStorage.setItem('foodAiFeedback', JSON.stringify(allFeedback));
+        }
+        
+        function getFeedbackFromLocalStorage() {
+            return JSON.parse(localStorage.getItem('foodAiFeedback') || '[]');
+        }
+        
+        function getFeedbackStats() {
+            const allFeedback = getFeedbackFromLocalStorage();
+            
+            const total = allFeedback.length;
+            const positive = allFeedback.filter(item => item.feedback === 'up').length;
+            const negative = allFeedback.filter(item => item.feedback === 'down').length;
+            
+            const flavorRatings = allFeedback
+                .filter(item => item.flavor_rating !== undefined)
+                .map(item => item.flavor_rating);
+                
+            const textureRatings = allFeedback
+                .filter(item => item.texture_rating !== undefined)
+                .map(item => item.texture_rating);
+            
+            const avgFlavor = flavorRatings.length > 0 ? 
+                flavorRatings.reduce((sum, rating) => sum + rating, 0) / flavorRatings.length : 0;
+                
+            const avgTexture = textureRatings.length > 0 ? 
+                textureRatings.reduce((sum, rating) => sum + rating, 0) / textureRatings.length : 0;
+            
+            return {
+                total_feedback: total,
+                positive_feedback: positive,
+                negative_feedback: negative,
+                average_flavor_rating: avgFlavor.toFixed(2),
+                average_texture_rating: avgTexture.toFixed(2)
+            };
+        }
+        
+        // Submit detailed feedback
+        async function submitDetailedFeedback() {
+            if (!currentBundleIngredients) return;
+            
+            try {
+                const bundle = document.querySelectorAll('.bundle')[currentBundleIndex];
+                const comments = document.getElementById('feedbackComments').value;
+                
+                // Ensure ingredients is properly formatted
+                let processedIngredients = currentBundleIngredients;
+                if (typeof currentBundleIngredients === 'string') {
+                    try {
+                        processedIngredients = JSON.parse(currentBundleIngredients);
+                    } catch (e) {
+                        console.warn('Could not parse ingredients string:', e);
+                        processedIngredients = [currentBundleIngredients];
+                    }
+                }
+                
+                const feedbackData = {
+                    bundle_id: `bundle-${currentBundleIndex}`,
+                    ingredients: processedIngredients,
+                    feedback: flavorRating >= 3 ? 'up' : 'down', // Consider 3+ stars as positive
+                    flavor_rating: flavorRating,
+                    texture_rating: textureRating,
+                    comments: comments,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Get the score if available
+                const scoreElement = bundle.querySelector('.bundle-score');
+                if (scoreElement) {
+                    feedbackData.total_score = parseFloat(scoreElement.textContent);
+                }
+                
+                const submitButton = document.getElementById('submitDetailedFeedback');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
+                
+                if (USE_LOCAL_STORAGE) {
+                    // Save to local storage
+                    saveFeedbackToLocalStorage(feedbackData);
+                    
+                    // Show success message
+                    const resultDiv = document.getElementById('feedbackResult');
+                    resultDiv.className = 'feedback-success';
+                    resultDiv.innerHTML = '✅ Thank you for your detailed feedback!';
+                    
+                    // Close modal after 2 seconds
+                    setTimeout(() => {
+                        closeFeedbackModal();
+                    }, 2000);
+                    
+                    console.log('Detailed feedback saved to local storage:', feedbackData);
+                } else {
+                    // Use server API
+                    const response = await fetch(`${API_BASE}/feedback`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(feedbackData)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    // Show success message
+                    const resultDiv = document.getElementById('feedbackResult');
+                    resultDiv.className = 'feedback-success';
+                    resultDiv.innerHTML = '✅ Thank you for your detailed feedback!';
+                    
+                    // Close modal after 2 seconds
+                    setTimeout(() => {
+                        closeFeedbackModal();
+                    }, 2000);
+                    
+                    console.log('Detailed feedback submitted successfully:', result);
+                }
+            } catch (error) {
+                console.error('Error submitting detailed feedback:', error);
+                const resultDiv = document.getElementById('feedbackResult');
+                resultDiv.className = 'feedback-error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            } finally {
+                // Re-enable submit button
+                const submitButton = document.getElementById('submitDetailedFeedback');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Feedback';
+            }
+        }
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('feedbackModal');
+            if (event.target === modal) {
+                closeFeedbackModal();
+            }
+        });
+    </script>
+</body>
+</html>
